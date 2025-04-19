@@ -45,7 +45,7 @@ export default function Home() {
             <div className="hidden md:flex justify-end">
               <div className="relative w-full max-w-md">
                 <img
-                  src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=700&q=80"
+                  src="https://images.unsplash.com/photo-1626315869436-d6781ba69d6e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt="Modern hospital exterior"
                   className="rounded-2xl shadow-2xl w-full h-80 object-cover border-4 border-white animate-fade-in"
                   style={{ minHeight: '18rem' }}
@@ -91,6 +91,39 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Doctor Dashboard</h3>
               <p className="text-gray-600">Doctors can manage their schedules, view patient history, and handle appointments.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Get in Touch Section */}
+      <section className="py-16 px-4 bg-gradient-to-b from-white to-blue-50 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Get in touch with us</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Phone Card */}
+            <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm0 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2zm0 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2zm8-12a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm0 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zm0 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Phone</h3>
+              <p className="text-gray-600">+1 (555) 123-4567</p>
+            </div>
+            {/* Email Card */}
+            <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12l-4-4-4 4m8 0v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4m16 0l-4 4-4-4" /></svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Email</h3>
+              <p className="text-gray-600">contact@yahya-hospital.com</p>
+            </div>
+            {/* Address Card */}
+            <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243A8 8 0 1117.657 16.657z" /></svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Address</h3>
+              <p className="text-gray-600">123 Wellness Ave, Health City, USA</p>
             </div>
           </div>
         </div>
