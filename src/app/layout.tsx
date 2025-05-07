@@ -1,38 +1,58 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Navbar from "@src/components/Navbar";
+import { Toaster } from "@src/components/ui/sonner";
+import { Provider } from "@src/app/provider";
+import { Session } from "next-auth";
 import "./globals.css";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+	variable: "--font-geist-sans",
+	subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+	variable: "--font-geist-mono",
+	subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Yahya Hospital",
-  description: "A comprehensive system for managing patients, doctors, and appointments",
-  keywords: ["hospital", "healthcare", "appointments", "doctors", "patients", "medical"],
+	title: "Yahya Hospital",
+	description:
+		"A comprehensive system for managing patients, doctors, and appointments",
+	keywords: [
+		"hospital",
+		"healthcare",
+		"appointments",
+		"doctors",
+		"patients",
+		"medical",
+	],
 };
 
-import Navbar from "@src/components/Navbar";
-
 export default function RootLayout({
-  children,
+	children,
+	session,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
+	session?: Session;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Navbar />
-        {children}
-      </body>
-    </html>
-  );
+	return (
+		<html lang="en">
+			<Provider session={session}>
+				<body
+					className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				>
+					<Toaster
+						position="top-center"
+						expand={true}
+						theme={"system"}
+						richColors={true}
+					/>
+					<Navbar />
+					{children}
+				</body>
+			</Provider>
+		</html>
+	);
 }
