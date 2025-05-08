@@ -24,6 +24,7 @@
       "@components/*": ["./src/components/*"],
       "@lib/*": ["./src/lib/*"],
       "@models/*": ["./src/models/*"],
+      "@actions/*": ["./src/actions/*"],
       "@api/*": ["./src/api/*"],
       "@app/*": ["./src/app/*"],
       "@public/*": ["./public/*"]

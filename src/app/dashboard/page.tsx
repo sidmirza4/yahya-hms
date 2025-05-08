@@ -2,37 +2,54 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import PatientAppointments from "./PatientAppointments";
 import BookAppointment from "./BookAppointment";
 import AdminDashboard from "./AdminDashboard";
+import DoctorAppointments from "./DoctorAppointments";
+import DoctorAvailability from "./DoctorAvailability";
+import { IUser } from "@models/User";
 
-interface User {
-  id: string;
+// Define a serialized user type that ensures _id is a string
+interface SerializedUser {
+  _id: string;
   name?: string;
   email: string;
-  role: "admin" | "doctor" | "patient";
+  role: string;
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: any; // Allow for other properties
 }
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { data: session, status } = useSession();
+  const [user, setUser] = useState<SerializedUser | null>(null);
 
   useEffect(() => {
-    const userStr = localStorage.getItem("currentUser");
-    if (!userStr) {
+    if (status === "loading") return;
+    
+    if (!session || !session.user) {
       router.push("/login");
       return;
     }
-    try {
-      const userObj = JSON.parse(userStr);
-      setUser(userObj);
-    } catch (e) {
-      localStorage.removeItem("currentUser");
-      router.push("/login");
-    }
-  }, [router]);
+    
+    // Get the user from session
+    const sessionUser = session.user as any;
+    
+    // Create a serialized user with _id as string
+    const serializedUser: SerializedUser = {
+      ...sessionUser,
+      // Ensure _id is a string
+      _id: typeof sessionUser._id === 'object' && sessionUser._id !== null
+        ? sessionUser._id.toString()
+        : String(sessionUser._id)
+    };
+    
+    setUser(serializedUser);
+  }, [session, status, router]);
 
-  if (!user) {
+  if (status === "loading" || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <span>Loading...</span>
@@ -66,11 +83,7 @@ export default function DashboardPage() {
   );
 }
 
-import DoctorAppointments from "./DoctorAppointments";
-
-import DoctorAvailability from "./DoctorAvailability";
-
-function DoctorDashboard({ user }: { user: User }) {
+function DoctorDashboard({ user }: { user: SerializedUser }) {
   return (
     <div>
       <div className="flex items-center gap-2 mb-2">
@@ -79,15 +92,15 @@ function DoctorDashboard({ user }: { user: User }) {
         </svg>
         <h2 className="text-xl font-semibold">Doctor Dashboard</h2>
       </div>
-      <DoctorAvailability doctorId={user.id} />
+      <DoctorAvailability doctorId={user._id} />
       <p className="mb-4">You can view and manage your appointment requests below.</p>
-      <DoctorAppointments doctorId={user.id} />
+      <DoctorAppointments doctorId={user._id} />
       {/* Future: Add patient list and more doctor-specific features here */}
     </div>
   );
 }
 
-function PatientDashboard({ user }: { user: User }) {
+function PatientDashboard({ user }: { user: SerializedUser }) {
   const [refresh, setRefresh] = useState(0);
   return (
     <div>
@@ -98,8 +111,8 @@ function PatientDashboard({ user }: { user: User }) {
         <h2 className="text-xl font-semibold">Patient Dashboard</h2>
       </div>
       <p className="mb-4">You can view your appointments and medical records here.</p>
-      <PatientAppointments userId={user.id} key={refresh} />
-      <BookAppointment patientId={user.id} onBooked={() => setRefresh(r => r + 1)} />
+      <PatientAppointments userId={user._id} key={refresh} />
+      <BookAppointment patientId={user._id} onBooked={() => setRefresh(r => r + 1)} />
       {/* Future: Add medical records here */}
     </div>
   );

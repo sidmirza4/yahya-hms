@@ -24,6 +24,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@src/components/ui/card";
+import { login } from "@src/actions/login";
+import LoginHelper from "@src/components/auth/LoginHelper";
 
 const loginSchema = z.object({
 	email: z.string().email("Please enter a valid email address"),
@@ -45,37 +47,48 @@ export default function LoginPage() {
 	});
 
 	const onSubmit = async (values: LoginFormValues) => {
+		setIsLoading(true);
 		try {
-			setIsLoading(true);
+			// First validate credentials with our server action
+			const validationResult = await login(values.email, values.password);
 
-			const res = await signIn("credentials", {
-				email: values.email,
-				password: values.password,
-				redirect: false,
-				callbackUrl: "/dashboard",
-			});
-
-			if (!res?.ok || res?.error) {
-				const errorMessage = res?.error || "Invalid credentials";
-				toast.error(errorMessage);
-				setIsLoading(false);
+			if (!validationResult.success) {
+				// Show validation error from server
+				toast.error(validationResult.error || "Login failed");
 				return;
 			}
 
-			toast.success("Logged in successfully!");
-			setIsLoading(false);
+			// If validation passed, use NextAuth to create the session
+			const signInResult = await signIn("credentials", {
+				email: values.email,
+				password: values.password,
+				redirect: false,
+				callbackUrl: "/dashboard"
+			});
 
-			// Wait for the toast to show before redirecting
-			setTimeout(() => {
-				router.push(res?.url || "/dashboard");
-				router.refresh(); // Refresh the page to update the session
-			}, 1000);
-		} catch (err: unknown) {
-			const errorMessage =
-				err instanceof Error
-					? err.message
-					: "An error occurred. Please try again.";
+			if (signInResult?.error) {
+				// Handle NextAuth error
+				console.error("NextAuth error:", signInResult.error);
+				toast.error("Authentication failed. Please try again.");
+				return;
+			}
+
+			// Success! Show message and redirect
+			toast.success("Logged in successfully!");
+			
+			// Use the callback URL from NextAuth or fallback to dashboard
+			const redirectUrl = signInResult?.url || "/dashboard";
+			router.push(redirectUrl);
+		} catch (error: any) {
+			console.error("Login error:", error);
+			
+			// Show a user-friendly error message
+			let errorMessage = "An unexpected error occurred";
+			if (error.message && !error.message.includes("https://errors.authjs.dev")) {
+				errorMessage = error.message;
+			}
 			toast.error(errorMessage);
+		} finally {
 			setIsLoading(false);
 		}
 	};
@@ -179,6 +192,7 @@ export default function LoginPage() {
 											Register
 										</Link>
 									</p>
+									<LoginHelper />
 								</div>
 							</form>
 						</Form>

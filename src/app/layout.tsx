@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@src/components/Navbar";
 import { Toaster } from "@src/components/ui/sonner";
-import { Provider } from "@src/app/provider";
+import Provider from "@src/app/provider";
 import { Session } from "next-auth";
 import "./globals.css";
 
@@ -32,14 +32,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
 	children,
-	session,
 }: Readonly<{
 	children: React.ReactNode;
-	session?: Session;
 }>) {
 	return (
 		<html lang="en">
-			<Provider session={session}>
+			<Provider>
 				<body
 					className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 				>
