@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { z } from "zod";
@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
 import { Input } from "@src/components/ui/input";
 import { toast } from "sonner";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import {
 	Form,
 	FormControl,
@@ -36,7 +36,15 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
 	const router = useRouter();
+	const { data: session, status } = useSession();
 	const [isLoading, setIsLoading] = useState(false);
+	
+	// Redirect if user is already authenticated
+	useEffect(() => {
+		if (status === "authenticated") {
+			router.push("/dashboard");
+		}
+	}, [status, router]);
 
 	const form = useForm<LoginFormValues>({
 		resolver: zodResolver(loginSchema),

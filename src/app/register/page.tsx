@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useSession } from "next-auth/react";
 import {
 	Card,
 	CardContent,
@@ -38,8 +39,16 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
 	const router = useRouter();
+	const { data: session, status } = useSession();
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
+	
+	// Redirect if user is already authenticated
+	useEffect(() => {
+		if (status === "authenticated") {
+			router.push("/dashboard");
+		}
+	}, [status, router]);
 
 	const form = useForm<RegisterFormValues>({
 		resolver: zodResolver(registerSchema),
