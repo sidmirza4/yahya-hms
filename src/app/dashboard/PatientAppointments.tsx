@@ -79,7 +79,7 @@ export default function PatientAppointments({ userId }: Props) {
 			<div className="bg-white p-6 rounded-xl shadow border border-blue-50 mx-auto flex flex-col items-center text-gray-400">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					className="animate-spin h-5 w-5 mr-3 text-blue-500"
+					className="animate-spin h-5 w-5 mr-3 text-slate-500"
 					viewBox="0 0 24 24"
 				>
 					<circle
@@ -112,7 +112,7 @@ export default function PatientAppointments({ userId }: Props) {
 					viewBox="0 0 24 24"
 					stroke="currentColor"
 					strokeWidth="2"
-					className="mb-2 text-blue-200"
+					className="mb-2 text-slate-300"
 				>
 					<path
 						strokeLinecap="round"
@@ -126,7 +126,7 @@ export default function PatientAppointments({ userId }: Props) {
 	}
 
 	return (
-		<div className="bg-white p-6 rounded-xl shadow border border-blue-50 max-w-5xl mx-auto">
+		<div className="bg-white p-6 rounded-xl shadow border border-slate-100 max-w-5xl mx-auto">
 			<div className="flex items-center gap-2 mb-4">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -136,7 +136,7 @@ export default function PatientAppointments({ userId }: Props) {
 					viewBox="0 0 24 24"
 					stroke="currentColor"
 					strokeWidth="2"
-					className="text-blue-500"
+					className="text-slate-500"
 				>
 					<path
 						strokeLinecap="round"
@@ -144,7 +144,7 @@ export default function PatientAppointments({ userId }: Props) {
 						d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
 					/>
 				</svg>
-				<h3 className="text-lg font-semibold text-blue-700">
+				<h3 className="text-lg font-semibold text-slate-700">
 					Upcoming Appointments
 				</h3>
 			</div>
@@ -152,7 +152,7 @@ export default function PatientAppointments({ userId }: Props) {
 			<div className="overflow-x-auto">
 				<table className="w-full border-collapse">
 					<thead>
-						<tr className="bg-blue-50 text-left">
+						<tr className="bg-slate-50 text-left">
 							<th className="px-4 py-2 border-b border-blue-100 font-semibold">
 								Doctor
 							</th>
@@ -186,7 +186,7 @@ export default function PatientAppointments({ userId }: Props) {
 							return (
 								<tr
 									key={app._id}
-									className="border-b border-blue-50 hover:bg-blue-50 transition-colors"
+									className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
 								>
 									<td className="px-4 py-3">
 										{doctor ? doctor.name : "Unknown"}{" "}
@@ -200,10 +200,10 @@ export default function PatientAppointments({ userId }: Props) {
 									<td className="px-4 py-3">
 										<span
 											className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-											${app.status === "confirmed" ? "bg-green-100 text-green-800" : ""}
-											${app.status === "pending" ? "bg-yellow-100 text-yellow-800" : ""}
-											${app.status === "cancelled" ? "bg-red-100 text-red-800" : ""}
-											${app.status === "completed" ? "bg-blue-100 text-blue-800" : ""}
+											${app.status === "confirmed" ? "bg-teal-50 text-teal-700" : ""}
+											${app.status === "pending" ? "bg-amber-50 text-amber-700" : ""}
+											${app.status === "cancelled" ? "bg-slate-100 text-slate-700" : ""}
+											${app.status === "completed" ? "bg-slate-100 text-slate-700" : ""}
 										`}
 										>
 											{app.status.charAt(0).toUpperCase() + app.status.slice(1)}
@@ -214,8 +214,9 @@ export default function PatientAppointments({ userId }: Props) {
 										{(app.status === "pending" ||
 											app.status === "confirmed") && (
 											<Button
-												variant="destructive"
+												variant="outline"
 												size="sm"
+												className="text-slate-600 border-slate-300 hover:bg-slate-100"
 												onClick={() => handleCancel(app._id)}
 											>
 												Cancel

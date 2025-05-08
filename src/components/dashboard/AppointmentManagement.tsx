@@ -163,27 +163,11 @@ export function AppointmentManagement({
 												</td>
 												<td className="px-4 py-3">
 													<span
-														className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
-                                    ${
-																			appointment.status === "confirmed"
-																				? "bg-green-100 text-green-800"
-																				: ""
-																		}
-                                    ${
-																			appointment.status === "pending"
-																				? "bg-yellow-100 text-yellow-800"
-																				: ""
-																		}
-                                    ${
-																			appointment.status === "cancelled"
-																				? "bg-red-100 text-red-800"
-																				: ""
-																		}
-                                    ${
-																			appointment.status === "completed"
-																				? "bg-blue-100 text-blue-800"
-																				: ""
-																		}
+														className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    ${appointment.status === "confirmed" ? "bg-teal-50 text-teal-700" : ""}
+                                    ${appointment.status === "pending" ? "bg-amber-50 text-amber-700" : ""}
+                                    ${appointment.status === "cancelled" ? "bg-slate-100 text-slate-700" : ""}
+                                    ${appointment.status === "completed" ? "bg-slate-100 text-slate-700" : ""}
                                   `}
 													>
 														{appointment.status.charAt(0).toUpperCase() +
@@ -209,8 +193,9 @@ export function AppointmentManagement({
 														)}
 														{appointment.status !== "cancelled" && (
 															<Button
-																variant="destructive"
+																variant="outline"
 																size="sm"
+																className="text-slate-600 border-slate-300 hover:bg-slate-100"
 																onClick={() =>
 																	handleUpdateAppointmentStatus(
 																		appointment._id,
@@ -223,8 +208,9 @@ export function AppointmentManagement({
 															</Button>
 														)}
 														<Button
-															variant="destructive"
+															variant="outline"
 															size="sm"
+															className="text-slate-600 border-slate-300 hover:bg-slate-100"
 															onClick={() =>
 																handleDeleteAppointment(appointment._id)
 															}

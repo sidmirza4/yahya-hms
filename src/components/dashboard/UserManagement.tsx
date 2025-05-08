@@ -353,8 +353,9 @@ export function UserManagement({
 														Edit
 													</Button>
 													<Button
-														variant="destructive"
+														variant="outline"
 														size="sm"
+														className="text-slate-600 border-slate-300 hover:bg-slate-100"
 														onClick={() => handleDeleteUser(user._id)}
 														disabled={actionLoading}
 													>
