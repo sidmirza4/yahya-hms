@@ -118,16 +118,22 @@ export function AppointmentManagement({
 											month: "short",
 										});
 										const year = date.getFullYear();
-										const hours = date
+										const startHours = date
 											.getHours()
 											.toString()
 											.padStart(2, "0");
-										const minutes = date
+										const startMinutes = date
 											.getMinutes()
 											.toString()
 											.padStart(2, "0");
+
+										// Calculate end time (30 minutes after start time)
+										const endDate = new Date(date.getTime() + 30 * 60000);
+										const endHours = endDate.getHours().toString().padStart(2, "0");
+										const endMinutes = endDate.getMinutes().toString().padStart(2, "0");
+
 										const formattedDate = `${day} ${month} ${year}`;
-										const formattedTime = `${hours}:${minutes}`;
+										const formattedTime = `${startHours}:${startMinutes}-${endHours}:${endMinutes}`;
 
 										const patient = users.find(
 											(u) => u._id === appointment.patientId

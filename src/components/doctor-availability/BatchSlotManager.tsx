@@ -6,7 +6,7 @@ import { Label } from "@components/ui/label";
 import { Checkbox } from "@components/ui/checkbox";
 import { IDoctorAvailabilitySlot } from "@models/DoctorAvailability";
 import { deleteDoctorSlot } from "@actions/doctorAvailability";
-import { format, parseISO, isAfter } from "date-fns";
+import { format, parseISO, isAfter, addMinutes } from "date-fns";
 
 interface BatchSlotManagerProps {
   slots: IDoctorAvailabilitySlot[];
@@ -14,6 +14,18 @@ interface BatchSlotManagerProps {
 }
 
 export default function BatchSlotManager({ slots, onSlotsChange }: BatchSlotManagerProps) {
+  // Helper function to format time as a range (e.g., "09:00-09:30")
+  const formatTimeRange = (time: string): string => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const startTime = new Date();
+    startTime.setHours(hours, minutes, 0, 0);
+    
+    const endTime = addMinutes(startTime, 30);
+    const endTimeStr = `${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+    
+    return `${time}-${endTimeStr}`;
+  };
+
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [filter, setFilter] = useState<"all" | "upcoming" | "today">("upcoming");
@@ -151,7 +163,9 @@ export default function BatchSlotManager({ slots, onSlotsChange }: BatchSlotMana
                     <td className="py-1 px-2 text-gray-700">
                       {format(parseISO(slot.date), "dd MMM yyyy")}
                     </td>
-                    <td className="py-1 px-2 font-mono text-gray-700">{slot.time}</td>
+                    <td className="py-1 px-2 font-mono text-gray-700">
+                      {formatTimeRange(slot.time)}
+                    </td>
                   </tr>
                 ))}
               </tbody>

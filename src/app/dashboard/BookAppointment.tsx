@@ -21,13 +21,14 @@ import {
 	PopoverTrigger,
 } from "@src/components/ui/popover";
 import { cn } from "@src/lib/utils";
+import { toast } from "sonner";
 
 interface Props {
 	patientId: string;
 	onBooked?: () => void;
 }
 
-import { FIXED_TIME_SLOTS } from "@src/utils/timeSlots";
+import { FIXED_TIME_SLOTS, getStartTimeFromRange } from "@src/utils/timeSlots";
 
 export default function BookAppointment({ patientId, onBooked }: Props) {
 	const [doctors, setDoctors] = useState<IUser[]>([]);
@@ -39,7 +40,6 @@ export default function BookAppointment({ patientId, onBooked }: Props) {
 	const [availableSlots, setAvailableSlots] = useState<string[]>([]);
 	const [isCheckingAvailability, setIsCheckingAvailability] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 	const router = useRouter();
@@ -89,7 +89,7 @@ export default function BookAppointment({ patientId, onBooked }: Props) {
 
 			if (slots.length === 0) {
 				setError(
-					"No available slots for this date. Please select another date."
+					"No available slots for this date. The doctor hasn't set availability or all slots are booked. Please select another date."
 				);
 			}
 		} catch (error) {
@@ -103,12 +103,11 @@ export default function BookAppointment({ patientId, onBooked }: Props) {
 	const handleBook = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
-		setSuccess(null);
 		setLoading(true);
 
 		try {
 			if (!doctorId || !formattedDate || !time) {
-				setError("Please select a doctor, date, and time.");
+				toast.error("Please select a doctor, date, and time.");
 				setLoading(false);
 				return;
 			}
@@ -120,7 +119,7 @@ export default function BookAppointment({ patientId, onBooked }: Props) {
 				time
 			);
 			if (!isAvailable) {
-				setError(
+				toast.error(
 					"This time slot is no longer available. Please select another time."
 				);
 				setLoading(false);
@@ -129,9 +128,11 @@ export default function BookAppointment({ patientId, onBooked }: Props) {
 				return;
 			}
 
-			const appointmentDate = new Date(`${formattedDate}T${time}`);
+			// Extract the start time from the time range
+			const startTime = getStartTimeFromRange(time);
+			const appointmentDate = new Date(`${formattedDate}T${startTime}`);
 			if (isNaN(appointmentDate.getTime())) {
-				setError("Invalid date or time.");
+				toast.error("Invalid date or time.");
 				setLoading(false);
 				return;
 			}
@@ -149,7 +150,7 @@ export default function BookAppointment({ patientId, onBooked }: Props) {
 			};
 
 			await addAppointment(newAppointment);
-			setSuccess("Appointment request sent!");
+			toast.success("Appointment request sent!");
 			setDoctorId("");
 			setSelectedDate(undefined);
 			setFormattedDate("");
@@ -159,7 +160,7 @@ export default function BookAppointment({ patientId, onBooked }: Props) {
 			router.refresh();
 		} catch (error) {
 			console.error("Error booking appointment:", error);
-			setError("Failed to book appointment. Please try again.");
+			toast.error("Failed to book appointment. Please try again.");
 		} finally {
 			setLoading(false);
 		}
@@ -322,17 +323,10 @@ export default function BookAppointment({ patientId, onBooked }: Props) {
 					/>
 				</div>
 
-				{/* Error and Success Messages */}
-				{error && (
-					<div className="p-3 bg-slate-100 text-slate-700 rounded-md text-sm">
-						{error}
-					</div>
-				)}
-				{success && (
-					<div className="p-3 bg-teal-50 text-teal-700 rounded-md text-sm">
-						{success}
-					</div>
-				)}
+				{/* Notes about appointment status */}
+				<div className="p-3 bg-slate-50 text-slate-600 rounded-md text-sm">
+					Your appointment request will be reviewed by the doctor. You'll be notified once it's confirmed.
+				</div>
 
 				{/* Submit Button */}
 				<Button

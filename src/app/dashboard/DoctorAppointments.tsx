@@ -208,27 +208,27 @@ export default function DoctorAppointments({ doctorId }: Props) {
 									<td className="px-4 py-3">
 										<span
 											className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                      ${
+                       ${
 												app.status === "confirmed"
-													? "bg-green-100 text-green-800"
+													? "bg-teal-50 text-teal-700"
 													: ""
 											}
-                      ${
+                       ${
 												app.status === "pending"
-													? "bg-yellow-100 text-yellow-800"
+													? "bg-amber-50 text-amber-700"
 													: ""
 											}
-                      ${
+                       ${
 												app.status === "cancelled"
-													? "bg-red-100 text-red-800"
+													? "bg-slate-100 text-slate-700"
 													: ""
 											}
-                      ${
+                       ${
 												app.status === "completed"
-													? "bg-blue-100 text-blue-800"
+													? "bg-slate-100 text-slate-700"
 													: ""
 											}
-                    `}
+                     `}
 										>
 											{app.status.charAt(0).toUpperCase() + app.status.slice(1)}
 										</span>
@@ -238,18 +238,20 @@ export default function DoctorAppointments({ doctorId }: Props) {
 										{app.status === "pending" && (
 											<div className="flex gap-2">
 												<Button
-													variant="default"
+													variant="outline"
 													size="sm"
+													className="bg-slate-600 text-white hover:bg-slate-700"
 													onClick={() => handleAction(app._id, "confirmed")}
 												>
 													Confirm
 												</Button>
 												<Button
-													variant="destructive"
+													variant="outline"
 													size="sm"
+													className="text-slate-600 border-slate-300 hover:bg-slate-100"
 													onClick={() => handleAction(app._id, "cancelled")}
 												>
-													Reject
+													Decline
 												</Button>
 											</div>
 										)}

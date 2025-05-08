@@ -75,12 +75,15 @@ export async function deleteAppointment(id: string): Promise<boolean> {
   }
 }
 
-export async function checkDoctorAvailability(doctorId: string, date: string, time: string): Promise<boolean> {
+export async function checkDoctorAvailability(doctorId: string, date: string, timeRange: string): Promise<boolean> {
   try {
     await dbConnect();
     
-    // Create date range for the selected time slot (30 min duration)
-    const startDateTime = new Date(`${date}T${time}`);
+    // Extract start time from the time range (e.g., "09:00-09:30" -> "09:00")
+    const startTime = timeRange.split('-')[0];
+    
+    // Create date range for the selected time slot
+    const startDateTime = new Date(`${date}T${startTime}`);
     const endDateTime = new Date(startDateTime.getTime() + 30 * 60000); // Add 30 minutes
     
     // Check if there are any existing appointments for this doctor in this time slot
@@ -105,6 +108,21 @@ export async function getDoctorAvailableSlots(doctorId: string, date: string): P
   try {
     await dbConnect();
     
+    // First, check if the doctor has set any availability slots for this date
+    const DoctorAvailability = (await import('@models/DoctorAvailability')).default;
+    const doctorAvailability = await DoctorAvailability.find({
+      doctorId,
+      date: date // Format: YYYY-MM-DD
+    });
+    
+    // If doctor hasn't set any availability for this date, return empty array
+    if (doctorAvailability.length === 0) {
+      return [];
+    }
+    
+    // Get all the times the doctor has marked as available
+    const availableTimes = doctorAvailability.map(slot => slot.time);
+    
     // Get all appointments for this doctor on this date
     const startOfDay = new Date(`${date}T00:00:00`);
     const endOfDay = new Date(`${date}T23:59:59`);
@@ -124,11 +142,24 @@ export async function getDoctorAvailableSlots(doctorId: string, date: string): P
       return `${appDate.getHours().toString().padStart(2, '0')}:${appDate.getMinutes().toString().padStart(2, '0')}`;
     });
     
-    // Import the time slots from utils
-    const { FIXED_TIME_SLOTS } = await import('@src/utils/timeSlots');
+    // Import the helper functions from utils
+    const { getStartTimeFromRange } = await import('@src/utils/timeSlots');
     
-    // Filter out the booked times
-    const availableSlots = FIXED_TIME_SLOTS.filter(slot => !bookedTimes.includes(slot));
+    // Convert available times to time ranges and filter out booked slots
+    const availableSlots = availableTimes.map(time => {
+      // Convert single time to range (e.g., "09:00" to "09:00-09:30")
+      const [hours, minutes] = time.split(':').map(Number);
+      const startTime = new Date();
+      startTime.setHours(hours, minutes, 0, 0);
+      
+      const endTime = new Date(startTime.getTime() + 30 * 60000); // Add 30 minutes
+      const endTimeStr = `${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+      
+      return `${time}-${endTimeStr}`;
+    }).filter(slot => {
+      const startTime = getStartTimeFromRange(slot);
+      return !bookedTimes.includes(startTime);
+    });
     
     return availableSlots;
   } catch (error) {

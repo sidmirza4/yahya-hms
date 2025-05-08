@@ -175,13 +175,19 @@ export default function PatientAppointments({ userId }: Props) {
 							// Get doctor from the map
 							const doctor = doctorsMap[app.doctorId] || null;
 
-							// Format date as DD MMM | HH:mm
+							// Format date as DD MMM | HH:mm-HH:mm (30 min slots)
 							const date = new Date(app.date);
 							const day = date.getDate().toString().padStart(2, "0");
 							const month = date.toLocaleString("en-US", { month: "short" });
-							const hours = date.getHours().toString().padStart(2, "0");
-							const minutes = date.getMinutes().toString().padStart(2, "0");
-							const formattedDate = `${day} ${month} | ${hours}:${minutes}`;
+							const startHours = date.getHours().toString().padStart(2, "0");
+							const startMinutes = date.getMinutes().toString().padStart(2, "0");
+							
+							// Calculate end time (30 minutes after start time)
+							const endDate = new Date(date.getTime() + 30 * 60000);
+							const endHours = endDate.getHours().toString().padStart(2, "0");
+							const endMinutes = endDate.getMinutes().toString().padStart(2, "0");
+							
+							const formattedDate = `${day} ${month} | ${startHours}:${startMinutes}-${endHours}:${endMinutes}`;
 
 							return (
 								<tr

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@components/ui/dialog";
 import { Button } from "@components/ui/button";
 import { Label } from "@components/ui/label";
 import { Checkbox } from "@components/ui/checkbox";
-import { FIXED_TIME_SLOTS } from "@src/utils/timeSlots";
-import { addDoctorSlot } from "@actions/doctorAvailability";
+import { FIXED_TIME_SLOTS, getStartTimeFromRange } from "@src/utils/timeSlots";
+import { addDoctorSlot, getDoctorSlotsByDoctor } from "@actions/doctorAvailability";
 import { format, addDays, parse } from "date-fns";
 
 interface SlotCreationModalProps {
@@ -30,12 +30,40 @@ export default function SlotCreationModal({
   const [recurringWeeks, setRecurringWeeks] = useState(4);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [existingSlots, setExistingSlots] = useState<string[]>([]);
+  const [fetchingSlots, setFetchingSlots] = useState(false);
+
+  // Fetch existing slots when date changes
+  useEffect(() => {
+    if (date) {
+      fetchExistingSlots();
+    }
+  }, [date, doctorId]);
+
+  const fetchExistingSlots = async () => {
+    if (!date) return;
+    
+    setFetchingSlots(true);
+    try {
+      const allSlots = await getDoctorSlotsByDoctor(doctorId);
+      const slotsForSelectedDate = allSlots.filter(slot => slot.date === date);
+      const existingTimes = slotsForSelectedDate.map(slot => slot.time);
+      setExistingSlots(existingTimes);
+    } catch (error) {
+      console.error("Error fetching existing slots:", error);
+    } finally {
+      setFetchingSlots(false);
+    }
+  };
 
   const handleTimeToggle = (time: string) => {
+    // Extract the start time from the time range
+    const startTime = getStartTimeFromRange(time);
+    
     setSelectedTimes((prev) =>
-      prev.includes(time)
-        ? prev.filter((t) => t !== time)
-        : [...prev, time]
+      prev.includes(startTime)
+        ? prev.filter((t) => t !== startTime)
+        : [...prev, startTime]
     );
   };
 
@@ -109,19 +137,31 @@ export default function SlotCreationModal({
           <div className="space-y-2">
             <Label>Select Time Slots</Label>
             <div className="grid grid-cols-3 gap-2">
-              {FIXED_TIME_SLOTS.map((time) => (
-                <div
-                  key={time}
-                  className={`p-2 border rounded cursor-pointer text-center ${
-                    selectedTimes.includes(time)
-                      ? "bg-blue-100 border-blue-500"
-                      : "hover:bg-gray-50"
-                  }`}
-                  onClick={() => handleTimeToggle(time)}
-                >
-                  {time}
-                </div>
-              ))}
+              {fetchingSlots ? (
+                <div className="col-span-3 text-center py-4 text-gray-500">Loading available slots...</div>
+              ) : (
+                FIXED_TIME_SLOTS.map((timeRange) => {
+                  const startTime = getStartTimeFromRange(timeRange);
+                  const isAlreadyBooked = existingSlots.includes(startTime);
+                  
+                  return (
+                    <div
+                      key={timeRange}
+                      className={`p-2 border rounded text-center ${
+                        isAlreadyBooked 
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+                          : selectedTimes.includes(startTime)
+                            ? "bg-blue-100 border-blue-500 cursor-pointer"
+                            : "hover:bg-gray-50 cursor-pointer"
+                      }`}
+                      onClick={() => !isAlreadyBooked && handleTimeToggle(timeRange)}
+                      title={isAlreadyBooked ? "This slot is already booked" : ""}
+                    >
+                      {timeRange}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
 

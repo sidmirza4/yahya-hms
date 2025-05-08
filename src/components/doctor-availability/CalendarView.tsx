@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { Calendar } from "@components/ui/calendar";
 import { Button } from "@components/ui/button";
 import { IDoctorAvailabilitySlot } from "@models/DoctorAvailability";
-import { format, parse, isEqual, isAfter } from "date-fns";
 import { deleteDoctorSlot } from "@actions/doctorAvailability";
+import { format, isSameDay, addMinutes, parse, isEqual } from "date-fns";
 
 interface CalendarViewProps {
   slots: IDoctorAvailabilitySlot[];
@@ -14,6 +14,18 @@ interface CalendarViewProps {
 }
 
 export default function CalendarView({ slots, onSlotSelect, onSlotsChange }: CalendarViewProps) {
+  // Helper function to format time as a range (e.g., "09:00-09:30")
+  const formatTimeRange = (time: string): string => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const startTime = new Date();
+    startTime.setHours(hours, minutes, 0, 0);
+    
+    const endTime = addMinutes(startTime, 30);
+    const endTimeStr = `${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`;
+    
+    return `${time}-${endTimeStr}`;
+  };
+
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [dateSlots, setDateSlots] = useState<IDoctorAvailabilitySlot[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -109,7 +121,7 @@ export default function CalendarView({ slots, onSlotSelect, onSlotsChange }: Cal
                   key={slot._id} 
                   className="flex justify-between items-center bg-blue-50 rounded-md py-1.5 px-3"
                 >
-                  <span className="font-medium text-sm">{slot.time}</span>
+                  <span className="font-medium text-sm">{formatTimeRange(slot.time)}</span>
                   <button 
                     type="button"
                     className="text-gray-600 hover:text-red-600 transition-colors"

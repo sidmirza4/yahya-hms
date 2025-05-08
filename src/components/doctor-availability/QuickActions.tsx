@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@components/ui/button";
 import { addDoctorSlot } from "@actions/doctorAvailability";
 import { format, addDays, addWeeks } from "date-fns";
-import { FIXED_TIME_SLOTS } from "@src/utils/timeSlots";
+import { FIXED_TIME_SLOTS, getStartTimeFromRange } from "@src/utils/timeSlots";
 
 interface QuickActionsProps {
   doctorId: string;
@@ -29,7 +29,8 @@ export default function QuickActions({ doctorId, onSlotsChange }: QuickActionsPr
   const addMorningSlots = async () => {
     const morningSlots = FIXED_TIME_SLOTS.filter(
       time => {
-        const hour = parseInt(time.split(":")[0]);
+        const startTime = getStartTimeFromRange(time);
+        const hour = parseInt(startTime.split(":")[0]);
         return hour >= 9 && hour < 13;
       }
     );
@@ -41,7 +42,8 @@ export default function QuickActions({ doctorId, onSlotsChange }: QuickActionsPr
   const addAfternoonSlots = async () => {
     const afternoonSlots = FIXED_TIME_SLOTS.filter(
       time => {
-        const hour = parseInt(time.split(":")[0]);
+        const startTime = getStartTimeFromRange(time);
+        const hour = parseInt(startTime.split(":")[0]);
         return hour >= 13;
       }
     );
@@ -63,16 +65,19 @@ export default function QuickActions({ doctorId, onSlotsChange }: QuickActionsPr
         const formattedDate = format(currentDate, "yyyy-MM-dd");
         
         // Add all time slots for this day
-        for (const time of FIXED_TIME_SLOTS) {
+        for (const timeRange of FIXED_TIME_SLOTS) {
           try {
+            // Extract the start time from the time range (e.g., "09:00-09:30" -> "09:00")
+            const startTime = getStartTimeFromRange(timeRange);
+            
             await addDoctorSlot({
               doctorId,
               date: formattedDate,
-              time,
+              time: startTime,
             });
           } catch (error) {
             // Ignore duplicate slot errors
-            console.log("Slot might already exist:", formattedDate, time);
+            console.log("Slot might already exist:", formattedDate, timeRange);
           }
         }
       }
@@ -90,7 +95,8 @@ export default function QuickActions({ doctorId, onSlotsChange }: QuickActionsPr
   const addSlotsWithPattern = async (timeSlots: string[], days: number) => {
     try {
       setIsLoading(true);
-      setActionType(timeSlots[0].startsWith("09") ? "morning" : "afternoon");
+      const firstSlotStartTime = getStartTimeFromRange(timeSlots[0]);
+      setActionType(firstSlotStartTime.startsWith("09") ? "morning" : "afternoon");
       
       const today = new Date();
       
@@ -104,16 +110,19 @@ export default function QuickActions({ doctorId, onSlotsChange }: QuickActionsPr
         const formattedDate = format(currentDate, "yyyy-MM-dd");
         
         // Add the specified time slots for this day
-        for (const time of timeSlots) {
+        for (const timeRange of timeSlots) {
           try {
+            // Extract the start time from the time range
+            const startTime = getStartTimeFromRange(timeRange);
+            
             await addDoctorSlot({
               doctorId,
               date: formattedDate,
-              time,
+              time: startTime,
             });
           } catch (error) {
             // Ignore duplicate slot errors
-            console.log("Slot might already exist:", formattedDate, time);
+            console.log("Slot might already exist:", formattedDate, timeRange);
           }
         }
       }
