@@ -1,8 +1,14 @@
+"use client";
+
 import Link from 'next/link';
 import { Button } from "@src/components/ui/button";
+import { useSession } from "next-auth/react";
 
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated";
+  
   return (
     <main className="flex min-h-screen flex-col">
       {/* Hero Section */}
@@ -23,23 +29,36 @@ export default function Home() {
                Comprehensive care, modern technology, compassionate staff.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="/login">
-                  <Button size="lg" variant="default" className="bg-white text-primary hover:bg-white/90 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="inline-block">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.75A2.75 2.75 0 0 0 13 3H7A2.75 2.75 0 0 0 4.25 5.75v12.5A2.75 2.75 0 0 0 7 21h6a2.75 2.75 0 0 0 2.75-2.75V15" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M18 12h-9m0 0 3.5 3.5M9 12l3.5-3.5" />
-                    </svg>
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button size="lg" variant="outline" className='bg-none text-primary flex items-center gap-2'>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="inline-block">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Register
-                  </Button>
-                </Link>
+                {!isAuthenticated ? (
+                  <>
+                    <Link href="/login">
+                      <Button size="lg" variant="default" className="bg-white text-primary hover:bg-white/90 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="inline-block">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.75A2.75 2.75 0 0 0 13 3H7A2.75 2.75 0 0 0 4.25 5.75v12.5A2.75 2.75 0 0 0 7 21h6a2.75 2.75 0 0 0 2.75-2.75V15" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M18 12h-9m0 0 3.5 3.5M9 12l3.5-3.5" />
+                        </svg>
+                        Login
+                      </Button>
+                    </Link>
+                    <Link href="/register">
+                      <Button size="lg" variant="outline" className='bg-none text-primary flex items-center gap-2'>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="inline-block">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Register
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <Link href="/dashboard">
+                    <Button size="lg" variant="default" className="bg-white text-primary hover:bg-white/90 flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="inline-block">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
             <div className="hidden md:flex justify-end">
